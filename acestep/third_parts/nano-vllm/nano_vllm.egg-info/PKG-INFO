@@ -1,0 +1,85 @@
+Metadata-Version: 2.4
+Name: nano-vllm
+Version: 0.2.0
+Summary: a lightweight vLLM implementation built from scratch
+Author: Xingkai Yu
+License: MIT
+Project-URL: Homepage, https://github.com/GeeeekExplorer/nano-vllm
+Requires-Python: <3.13,>=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=2.4.0
+Requires-Dist: triton-windows<3.4,>=3.0.0; sys_platform == "win32" and python_version == "3.11"
+Requires-Dist: triton>=3.0.0; sys_platform == "linux" and python_version == "3.11"
+Requires-Dist: transformers>=4.51.0
+Requires-Dist: flash-attn @ https://github.com/sdbds/flash-attention-for-windows/releases/download/2.8.2/flash_attn-2.8.2+cu128torch2.7.1cxx11abiFALSEfullbackward-cp311-cp311-win_amd64.whl ; sys_platform == "win32" and sys_platform != "darwin" and python_version == "3.11" and platform_machine == "AMD64"
+Requires-Dist: flash-attn @ https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.7.12/flash_attn-2.8.3+cu128torch2.10-cp311-cp311-linux_x86_64.whl ; sys_platform == "linux" and sys_platform != "darwin" and python_version == "3.11" and platform_machine == "x86_64"
+Requires-Dist: xxhash
+Dynamic: license-file
+
+<p align="center">
+<img width="300" src="assets/logo.png">
+</p>
+
+<p align="center">
+<a href="https://trendshift.io/repositories/15323" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15323" alt="GeeeekExplorer%2Fnano-vllm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</p>
+
+# Nano-vLLM
+
+A lightweight vLLM implementation built from scratch.
+
+## Key Features
+
+* 🚀 **Fast offline inference** - Comparable inference speeds to vLLM
+* 📖 **Readable codebase** - Clean implementation in ~ 1,200 lines of Python code
+* ⚡ **Optimization Suite** - Prefix caching, Tensor Parallelism, Torch compilation, CUDA graph, etc.
+
+## Installation
+
+```bash
+pip install git+https://github.com/GeeeekExplorer/nano-vllm.git
+```
+
+## Model Download
+
+To download the model weights manually, use the following command:
+```bash
+huggingface-cli download --resume-download Qwen/Qwen3-0.6B \
+  --local-dir ~/huggingface/Qwen3-0.6B/ \
+  --local-dir-use-symlinks False
+```
+
+## Quick Start
+
+See `example.py` for usage. The API mirrors vLLM's interface with minor differences in the `LLM.generate` method:
+```python
+from nanovllm import LLM, SamplingParams
+llm = LLM("/YOUR/MODEL/PATH", enforce_eager=True, tensor_parallel_size=1)
+sampling_params = SamplingParams(temperature=0.6, max_tokens=256)
+prompts = ["Hello, Nano-vLLM."]
+outputs = llm.generate(prompts, sampling_params)
+outputs[0]["text"]
+```
+
+## Benchmark
+
+See `bench.py` for benchmark.
+
+**Test Configuration:**
+- Hardware: RTX 4070 Laptop (8GB)
+- Model: Qwen3-0.6B
+- Total Requests: 256 sequences
+- Input Length: Randomly sampled between 100–1024 tokens
+- Output Length: Randomly sampled between 100–1024 tokens
+
+**Performance Results:**
+| Inference Engine | Output Tokens | Time (s) | Throughput (tokens/s) |
+|----------------|-------------|----------|-----------------------|
+| vLLM           | 133,966     | 98.37    | 1361.84               |
+| Nano-vLLM      | 133,966     | 93.41    | 1434.13               |
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=GeeeekExplorer/nano-vllm&type=Date)](https://www.star-history.com/#GeeeekExplorer/nano-vllm&Date)
